@@ -42,7 +42,8 @@
     나는 기존에 2에 많이 묶여있어서 제대로 못한 느낌이 크다. 이제는 벗어나서 해보자.
 */
 
-function solution(numbers, target) {
+
+function dfs1(numbers, target) {
     let count = 0;    
     const stack = [[0, 0]];
     
@@ -60,4 +61,65 @@ function solution(numbers, target) {
     }
     
     return count;
+}
+
+function dfs2(numbers, target) {
+    let count = 0;
+    
+    const dfs = (index, acc) => {
+        if (index === numbers.length && acc === target) {
+            count++;
+            return;
+        }
+        
+        if (index === numbers.length) return;
+        
+        dfs(index + 1, acc + numbers[index]);
+        dfs(index + 1, acc - numbers[index]);
+    }
+    
+    dfs(0, 0);
+    
+    return count;
+}
+
+// BFS는 옆으로 길게 되어있으면 풀기 어렵다. 
+// 배열 연산에서 shift는 굉장히 비싸기 때문에 시간 초과가 난다.
+// 이를 해결하기 위해서는 링크드 리스트를 구현하거나 하는 방법으로 해결해야 한다.
+function bfs1(numbers, target) {
+    const queue = [[0, 0]];
+    let count = 0;
+    
+    while(queue.length > 0) {
+        const [index, acc] = queue.shift();
+        
+        if (index === numbers.length && acc === target) count++;
+        
+        if (index === numbers.length) continue;
+        
+        queue.push([index + 1, acc + numbers[index]]);
+        queue.push([index + 1, acc - numbers[index]]);
+    }
+    
+    return count;
+}
+
+function solution(numbers, target) {
+    const bfs = (level, nodes) => {
+        // 재귀는 항상 종료조건이 필요하다.
+        if (level === numbers.length) {
+            return nodes.filter(node => node === target).length;
+        }
+        
+        const nextNodes = [];
+        
+        nodes.forEach(node => {
+            nextNodes.push(node + numbers[level]);
+            nextNodes.push(node - numbers[level]);
+        });
+        
+        return bfs(level + 1, nextNodes);
+    };
+    
+    return bfs(0, [0]);
 }
